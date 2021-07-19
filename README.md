@@ -180,4 +180,16 @@ Note that there are two main structures in the json file which are "before" and 
 
 ### Streaming Inserts to BigQuery with Cloud Dataflow
 
-In process ... 
+1) Go to Cloud Dataflow and select option "Create Job from Template".
+
+2) Fill in a Job Name of your preference, e.g: *cdc-pubsub-bigquery*.
+
+3) Select Dataflow template: "Pub/Sub Topic to BigQuery".
+
+4) Insert the Pub/Sub topic as projects/\<project\>/topics/\<topic-name\>
+
+5) Insert the BigQuery output table as \<project\>:\<dataset\>.\<table\>
+
+6) Insert a Temporary Location (a GCS bucket) where Cloud Dataflow will leave intermediatte files, product of its processing, e.g: gs://cdc-postres-debezium-bq/temp
+
+7) Leave all the other parameters with the options selected by default and press "RUN JOB".
