@@ -193,3 +193,45 @@ Note that there are two main structures in the json file which are "before" and 
 6) Insert a Temporary Location (a GCS bucket) where Cloud Dataflow will leave intermediatte files, product of its processing, e.g: gs://cdc-postres-debezium-bq/temp
 
 7) Leave all the other parameters with the options selected by default and press "RUN JOB".
+
+
+
+SELECT * EXCEPT(op, row_num)
+FROM (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num
+  FROM (
+    SELECT after.id, after.first_name, after.last_name, after.email, ts_ms, op
+    FROM `mimetic-might-312320.gentera.customers_delta`
+    UNION ALL
+    SELECT *, 'I'
+    FROM `mimetic-might-312320.gentera.customers_main`))
+WHERE
+  row_num = 1
+  AND op <> 'D'
+
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema = 'inventory'
+ORDER BY table_name;
+
+MERGE `mimetic-might-312320.gentera.customers_main` m
+USING
+  (
+  SELECT * EXCEPT(row_num)
+  FROM (
+    SELECT *, ROW_NUMBER() OVER(PARTITION BY COALESCE(after.id,before.id) ORDER BY delta.ts_ms DESC) AS row_num
+    FROM `mimetic-might-312320.gentera.customers_delta` delta )
+  WHERE row_num = 1) d
+ON  m.id = COALESCE(after.id,before.id)
+  WHEN NOT MATCHED
+AND op IN ("c", "u") THEN
+INSERT (id, first_name, last_name, email, ts_ms)
+VALUES (d.after.id, d.after.first_name, d.after.last_name, d.after.email, d.ts_ms)
+  WHEN MATCHED
+  AND d.op = "d" THEN
+DELETE
+  WHEN MATCHED
+  AND d.op = "u"
+  AND (m.ts_ms < d.ts_ms) THEN
+UPDATE
+SET first_name = d.after.first_name, last_name = d.after.last_name, email = d.after.email, ts_ms = d.ts_ms
