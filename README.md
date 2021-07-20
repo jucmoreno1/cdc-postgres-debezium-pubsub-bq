@@ -119,7 +119,7 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
 - *run.sh*
 
-### Testing the Debezium Connector and checking messages reception on Google Cloud Pub/Sub
+### Testing the Debezium Connector and checking messages reception on Cloud Pub/Sub
 
 1) Execute a quick SELECT statement to check the available information in the *customers* table.
 
