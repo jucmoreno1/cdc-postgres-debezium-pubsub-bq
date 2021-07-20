@@ -133,8 +133,8 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
         SELECT * FROM postgres.inventory.customers;
 
-    id  | first_name | last_name |         email  
-    ------+------------+-----------+-----------------------  
+    id   | first_name | last_name |         email  
+    -----+------------+-----------+-----------------------  
     1001 | Sally      | Thomas    | sally.thomas@acme.com  
     1002 | George     | Bailey    | gbailey@foobar.com  
     1003 | Edward     | Walker    | ed@walker.com  
