@@ -78,7 +78,7 @@ Create a Cloud Pub/Sub topic with the following naming convertion:
 Our example will use the customers table (one of the table created with the SQL script we ran before).
 Topic name for this example:
 
-    *cdc-postgres-instance.inventory.customers*  
+    cdc-postgres-instance.inventory.customers  
 
 When creating the topic, select the option "Add a default subscription".
 
