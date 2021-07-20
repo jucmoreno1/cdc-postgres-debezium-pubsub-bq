@@ -131,7 +131,7 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
 1) Execute a quick SELECT statement to check the available information in the *customers* table.
 
-    *SELECT * FROM postgres.inventory.customers;*
+        SELECT * FROM postgres.inventory.customers;
 
     id  | first_name | last_name |         email  
     ------+------------+-----------+-----------------------  
