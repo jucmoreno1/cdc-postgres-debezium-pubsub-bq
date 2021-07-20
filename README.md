@@ -209,6 +209,7 @@ You can use the script below to perform the initial load to the BigQuery *custom
 
 As time goes by, the *customers_main* table will start having outdated information. To achieve immediate consistency and to show the current version of the data, this approach proposes to JOIN the MAIN table (*customers_main*) with the DELTA table (*customers_delta*) which contains the track of the changes that occured in the Postgres DB instance.
 
+CREATE VIEW \<dataset\>.immediate_consistency_customers AS (
     SELECT * EXCEPT(op, row_num)  
     FROM (  
         SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num  
@@ -216,22 +217,24 @@ As time goes by, the *customers_main* table will start having outdated informati
             SELECT after.id, after.first_name, after.last_name, after.email, ts_ms, op  
             FROM `mimetic-might-312320.gentera.customers_delta`  
             UNION ALL  
-            SELECT *, 'I'  
+            SELECT *, 'i'  
             FROM `mimetic-might-312320.gentera.customers_main`))  
     WHERE  
     row_num = 1  
     AND op <> 'D'  
+)
 
 The SQL statement in the preceding BigQuery view does the following:
 
 - The innermost UNION ALL produces the rows from both the main and the delta tables:
-    - SELECT * EXCEPT(change_type), change_type FROM session_delta forces the change_type column to be the last column in the list.
-    - SELECT *, ‘I' FROM session_main selects the row from the main table as if it were an insert row.
+    - SELECT * EXCEPT(op), op FROM customers_delta forces the op (op = operation type) column to be the last column in the list.
+    - SELECT *, ‘i' FROM customers_main selects the row from the main table as if it were an insert row.
     - Using the * operator keeps the example simple. If there were additional columns or a different column order, replace the shortcut with explicit column lists.
-- SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY change_id DESC) AS row_num uses an analytic function in BigQuery to assign sequential row numbers starting with 1 to each of the groups of rows that have the same value of id, defined by PARTITION BY. The rows are ordered by change_id in descending order within that group. Because change_id is guaranteed to increase, the latest change has a row_num column that has a value of 1.
-- WHERE row_num = 1 AND change_type <> 'D' selects only the latest row from each group. This is a common deduplication technique in BigQuery. This clause also removes the row from the result if its change type is delete.
-- The topmost SELECT * EXCEPT(change_type, row_num) removes the extra columns that were introduced for processing and which aren't relevant otherwise.
+- SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num uses an analytic function in BigQuery to assign sequential row numbers starting with 1 to each of the groups of rows that have the same value of id, defined by the PARTITION BY clause. The rows are ordered by ts_ms (timestamp in miliseconds) in descending order within that group. Because ts_ms is guaranteed to increase, the latest change has a row_num column that has a value of 1.
+- WHERE row_num = 1 AND op <> 'D' selects only the latest row from each group. This is a common deduplication technique in BigQuery. This clause also removes the row from the result if its change type is delete.
+- The topmost SELECT * EXCEPT(op, row_num) removes the extra columns that were introduced for processing and which aren't relevant otherwise.
 
+After you create the view, you can run queries against it. To get the most recent changes, you can run a query like the following:
 
 ### Cost Optimized approach
 
@@ -258,4 +261,23 @@ With this approach, queries are faster and less expensive at the expense of some
     AND d.op = "u"  
     AND (m.ts_ms < d.ts_ms) THEN  
     UPDATE  
-    SET first_name = d.after.first_name, last_name = d.after.last_name, email = d.after.email, ts_ms = d.ts_ms  
+    SET first_name = d.after.first_name, last_name = d.after.last_name, email = d.after.email, ts_ms = d.ts_ms
+
+The best way to merge data frequently and consistently is to use a MERGE statement, which lets you combine multiple INSERT, UPDATE, and DELETE statements into a single atomic operation. Following are some of the nuances of the preceding MERGE statement:
+
+- The session_main table is merged with the data source that is specified in the USING clause, a subquery in this case.
+- The subquery uses the same technique as the view in immediate consistency approach: it selects the latest row in the group of records that have the same id value—a combination of ROW_NUMBER() OVER(PARTITION BY COALESCE(after.id,before.id) ORDER BY ts_ms DESC) row_num and WHERE row_num = 1.
+- Merge is performed on the id columns of both tables, which is the primary key.
+- The WHEN NOT MATCHED clause checks for a match. If there is no match, the query checks that the latest record is either insert or update, and then inserts the record.
+- When the record is matched and the operation type is delete, the record is deleted in the main table.
+When the record is matched, the operation type is update, and the delta table's ts_ms value is higher than the ts_ms value of the main record, the data is updated, including the most recent ts_ms value.
+The preceding MERGE statement works correctly for any combinations of the following changes:
+
+Multiple update rows for the same primary key: only the latest update will apply.
+Unmatched updates in the main table: if the main table doesn't have the record under the primary key, a new record is inserted.
+
+This approach skips the main table extract and starts with the delta table. The main table is automatically populated.
+
+Insert and update rows in the unprocessed delta batch. The most recent update row is used and a new record is inserted into the main table.
+
+Insert and delete rows in the unprocessed batch. The record isn't inserted.
