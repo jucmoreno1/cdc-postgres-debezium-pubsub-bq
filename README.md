@@ -9,7 +9,8 @@ Captured DB changes are sent to Cloud Pub/Sub and pushed to BigQuery thru the te
 ### Prerequisites
 Commands executed in this tutorial where performed in WSL (Windows Subsystem for Linux) in an Ubuntu distribution.
 Needs Java to be installed in the Ubuntu distribution. You can check it with command *java --version*. If not installed please install it by running the following commands.  
-    *sudo apt-get update*
+
+    *sudo apt-get update*  
     *sudo apt install openjdk-11-jre-headless*
 
 Create a folder where we will be storing all the files needed, such as Debezium Connector files, SQL scripts, Cloud SQL Proxy files, etc. As of this example we created a folder called *debezium-server-postgres* by runnging command:
