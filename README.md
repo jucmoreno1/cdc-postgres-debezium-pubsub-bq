@@ -15,7 +15,7 @@ Needs Java to be installed in the Ubuntu distribution. You can check it with com
 
 Create a folder where we will be storing all the files needed, such as Debezium Connector files, SQL scripts, Cloud SQL Proxy files, etc. As of this example we created a folder called *debezium-server-postgres* by runnging command:  
 
-  mkdir debezium-server-postgres  
+    mkdir debezium-server-postgres  
 
 Install the Postgres database client by running the following command:  
     sudo apt-get install postgre-client  
