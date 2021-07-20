@@ -18,6 +18,7 @@ Create a folder where we will be storing all the files needed, such as Debezium 
     mkdir debezium-server-postgres  
 
 Install the Postgres database client by running the following command:  
+
     sudo apt-get install postgre-client  
 
 ### Cloud SQL Postgres Instance Deployment
