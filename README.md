@@ -72,10 +72,13 @@ Leave this terminal open as we will be issuing SQL statements to generate change
 ### Cloud Pub/Sub - Topics creation
 
 Create a Cloud Pub/Sub topic with the following naming convertion:  
-\<instance-name\>.\<schema\>.\<table\>
+
+    \<instance-name\>.\<schema\>.\<table\>  
 
 Our example will use the customers table (one of the table created with the SQL script we ran before).
-Topic name for this example: *cdc-postgres-instance.inventory.customers*
+Topic name for this example:
+
+    *cdc-postgres-instance.inventory.customers*  
 
 When creating the topic, select the option "Add a default subscription".
 
