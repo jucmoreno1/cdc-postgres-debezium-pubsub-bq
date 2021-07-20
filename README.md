@@ -120,12 +120,12 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
 5) Create folder data and and an empty file called "*offsets.dat*".
 
-- *mkdir data*
-- *touch data/offsets.dat*
+    mkdir data  
+    touch data/offsets.dat  
 
 6) Execute from the terminal the executable file run.sh with the following command:
 
-- *run.sh*
+    run.sh
 
 ### Testing the Debezium Connector and checking messages reception on Cloud Pub/Sub
 
@@ -154,10 +154,10 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
     {  
     "before":{  
-    &nbsp;&nbsp;&nbsp;&nbsp;"id":1001,  
-    &nbsp;&nbsp;&nbsp;&nbsp;"first_name":"Sally",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"last_name":"Thomas",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"email":"sally.thomas@acme.com"  
+        "id":1001,  
+        "first_name":"Sally",  
+        "last_name":"Thomas",  
+        "email":"sally.thomas@acme.com"  
     },  
     "after":{  
     &nbsp;&nbsp;&nbsp;&nbsp;"id":1001,  
