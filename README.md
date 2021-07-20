@@ -277,7 +277,8 @@ Multiple update rows for the same primary key: only the latest update will apply
 Unmatched updates in the main table: if the main table doesn't have the record under the primary key, a new record is inserted.
 
 This approach skips the main table extract and starts with the delta table. The main table is automatically populated.
-
 Insert and update rows in the unprocessed delta batch. The most recent update row is used and a new record is inserted into the main table.
-
 Insert and delete rows in the unprocessed batch. The record isn't inserted.
+
+For more information please refer to Google official documentation in the following url:
+https://cloud.google.com/architecture/database-replication-to-bigquery-using-change-data-capture
