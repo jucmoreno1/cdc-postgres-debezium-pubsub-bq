@@ -39,7 +39,7 @@ As of this example, these are the chosen names for instance, database, schema an
 
 3) Copy and paste SQL statements in file script-inventory.sql and run them to create the template data to be used for the puspose of this tutorial.  
 
-4) Execute the following command to allow database replication for the user the Debezium Connector will use to connect. After performing this step Google Cloud SDK shell can be closed.
+4) Execute the following command to allow database replication for the user the Debezium Connector will use to connect. After performing this step Google Cloud SDK shell can be closed.  
 
     ALTER USER existing_user WITH REPLICATION;  
 
@@ -154,10 +154,10 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
     {  
     "before":{  
-        "id":1001,  
-        "first_name":"Sally",  
-        "last_name":"Thomas",  
-        "email":"sally.thomas@acme.com"  
+    &nbsp;&nbsp;&nbsp;&nbsp;"id":1001,  
+    &nbsp;&nbsp;&nbsp;&nbsp;"first_name":"Sally",  
+    &nbsp;&nbsp;&nbsp;&nbsp;"last_name":"Thomas",  
+    &nbsp;&nbsp;&nbsp;&nbsp;"email":"sally.thomas@acme.com"  
     },  
     "after":{  
     &nbsp;&nbsp;&nbsp;&nbsp;"id":1001,  
