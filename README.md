@@ -142,11 +142,11 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
 2) We will update user 1001 with the following statement to test the Debezium Connector capturing feature:
 
- - *UPDATE postgres.inventory.customers  
-    SET first_name = 'your-name',  
-    last_name = 'your last-name',  
-    email = 'your email'  
-    WHERE id = 1001;*  
+        UPDATE postgres.inventory.customers  
+        SET first_name = 'your-name',  
+        last_name = 'your last-name',  
+        email = 'your email'  
+        WHERE id = 1001;
 
 3) Once executed, go to Google Cloud Pub/Sub and verify the reception of the message on the subscription of the topic create by selecting option "View Messages" >> "Pull"
 
