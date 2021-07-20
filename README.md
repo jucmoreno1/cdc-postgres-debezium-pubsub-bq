@@ -194,25 +194,31 @@ Note that there are two main structures in the json file which are "before" and 
 
 7) Leave all the other parameters with the options selected by default and press "RUN JOB".
 
+### Immediate Consistency approach
 
+Queries reflect the current state of replicated data. Immediate consistency requires a query that joins the main table and the delta table, and selects the most recent row for each primary key.
 
-SELECT * EXCEPT(op, row_num)  
-FROM (  
-  SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num  
-  FROM (  
-    SELECT after.id, after.first_name, after.last_name, after.email, ts_ms, op  
-    FROM `mimetic-might-312320.gentera.customers_delta`  
-    UNION ALL  
-    SELECT *, 'I'  
-    FROM `mimetic-might-312320.gentera.customers_main`))  
-WHERE  
-  row_num = 1  
-  AND op <> 'D'  
+    SELECT * EXCEPT(op, row_num)  
+    FROM (  
+    SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num  
+    FROM (  
+        &nbsp;&nbsp;SELECT after.id, after.first_name, after.last_name, after.email, ts_ms, op  
+        &nbsp;&nbsp;FROM `mimetic-might-312320.gentera.customers_delta`  
+        &nbsp;&nbsp;UNION ALL  
+        &nbsp;&nbsp;SELECT *, 'I'  
+        &nbsp;&nbsp;FROM `mimetic-might-312320.gentera.customers_main`))  
+    WHERE  
+    row_num = 1  
+    AND op <> 'D'  
 
-SELECT table_schema, table_name  
-FROM information_schema.tables  
-WHERE table_schema = 'inventory'  
-ORDER BY table_name;  
+    SELECT table_schema, table_name  
+    FROM information_schema.tables  
+    WHERE table_schema = 'inventory'  
+    ORDER BY table_name;  
+
+### Cost Optimized approach
+
+faster and less expensive queries are executed at the expense of some delay in data availability. You can periodically merge the data into the main table.
 
 MERGE `mimetic-might-312320.gentera.customers_main` m  
 USING  
