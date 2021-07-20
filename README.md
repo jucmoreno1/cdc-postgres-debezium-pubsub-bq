@@ -202,11 +202,11 @@ Queries reflect the current state of replicated data. Immediate consistency requ
     FROM (  
     SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num  
     FROM (  
-        &nbsp;&nbsp;SELECT after.id, after.first_name, after.last_name, after.email, ts_ms, op  
-        &nbsp;&nbsp;FROM `mimetic-might-312320.gentera.customers_delta`  
-        &nbsp;&nbsp;UNION ALL  
-        &nbsp;&nbsp;SELECT *, 'I'  
-        &nbsp;&nbsp;FROM `mimetic-might-312320.gentera.customers_main`))  
+        SELECT after.id, after.first_name, after.last_name, after.email, ts_ms, op  
+        FROM `mimetic-might-312320.gentera.customers_delta`  
+        UNION ALL  
+        SELECT *, 'I'  
+        FROM `mimetic-might-312320.gentera.customers_main`))  
     WHERE  
     row_num = 1  
     AND op <> 'D'  
