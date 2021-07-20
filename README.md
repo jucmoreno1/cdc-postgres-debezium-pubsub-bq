@@ -131,9 +131,9 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
 1) Execute a quick SELECT statement to check the available information in the *customers* table.
 
-        SELECT * FROM postgres.inventory.customers;
+        SELECT * FROM postgres.inventory.customers ORDER BY id;
 
-        id   | first_name | last_name |         email  
+        id   | first_name | last_name | email  
         -----+------------+-----------+-----------------------  
         1001 | Sally      | Thomas    | sally.thomas@acme.com  
         1002 | George     | Bailey    | gbailey@foobar.com  
@@ -222,7 +222,7 @@ As time goes by, the *customers_main* table will start having outdated informati
         FROM (  
             SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num  
             FROM (  
-                SELECT after.id, after.first_name, after.last_name, after.email, ts_ms, op  
+                SELECT COALESCE(after.id,before.id) AS id, after.first_name, after.last_name, after.email, ts_ms, op  
                 FROM `mimetic-might-312320.gentera.customers_delta`  
                 UNION ALL  
                 SELECT *, 'i'  
