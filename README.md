@@ -13,11 +13,12 @@ Needs Java to be installed in the Ubuntu distribution. You can check it with com
     sudo apt-get update  
     sudo apt install openjdk-11-jre-headless  
 
-Create a folder where we will be storing all the files needed, such as Debezium Connector files, SQL scripts, Cloud SQL Proxy files, etc. As of this example we created a folder called *debezium-server-postgres* by runnging command:
-- *mkdir debezium-server-postgres*
+Create a folder where we will be storing all the files needed, such as Debezium Connector files, SQL scripts, Cloud SQL Proxy files, etc. As of this example we created a folder called *debezium-server-postgres* by runnging command:  
 
-Install the Postgres database client by running the following command:
-- *sudo apt-get install postgre-client*
+  mkdir debezium-server-postgres  
+
+Install the Postgres database client by running the following command:  
+    sudo apt-get install postgre-client  
 
 ### Cloud SQL Postgres Instance Deployment
 
@@ -32,33 +33,38 @@ As of this example, these are the chosen names for instance, database, schema an
     IMPORTANT: Expand the "Show Configurations Options" to customize your instance and go to FLAGS section. Select from the dropdown the FLAG "cloudsql.logical_decoding" and set it to ON. This feature will allow logical decoding on the Cloud SQL instance to convert WAL (write ahead log) entries to JSON format. These JSON entries will be published to the Cloud Pub/Sub topic that we will later create.
 
 2) Once the Cloud SQL database (Postgres) has been deployed, connect to your SQL instance using Google Cloud SDK shell with command:  
-- *gcloud sql connect \<*instance-name*\> --database=\<*database*\> --user=\<*user*\>*
+
+    gcloud sql connect \<*instance-name*\> --database=\<*database*\> --user=\<*user*\>  
 
 3) Copy and paste SQL statements in file script-inventory.sql and run them to create the template data to be used for the puspose of this tutorial.  
 
 4) Execute the following command to allow database replication for the user the Debezium Connector will use to connect. After performing this step Google Cloud SDK shell can be closed.
 
-- *ALTER USER existing_user WITH REPLICATION;*
+    ALTER USER existing_user WITH REPLICATION;  
 
 ### Cloud SQL Auth Proxy
 
 To connect to our Cloud SQL instance we will be using Cloud SQL proxy.
 
 Download the Cloud SQL Proxy using the following command:  
-- *VERSION=v1.21.0*  
-- *wget "https://storage.googleapis.com/cloudsql-proxy/$VERSION/cloud_sql_proxy.linux.amd64" -O cloud_sql_proxy*
+    
+    VERSION=v1.21.0    
+    wget "https://storage.googleapis.com/cloudsql-proxy/$VERSION/cloud_sql_proxy.linux.amd64" -O cloud_sql_proxy  
 
 Give execution permissions to the file using the following command:  
-- *chmod +x cloud_sql_proxy*
+    
+    chmod +x cloud_sql_proxy  
 
 Connect to your Cloud SQL instance using the following command:  
-- *./cloud_sql_proxy --instances=\<project\>:\<location\>:\<instance-name\>=tcp:0.0.0.0:5432*
+
+    ./cloud_sql_proxy --instances=\<project\>:\<location\>:\<instance-name\>=tcp:0.0.0.0:5432
 
 Check tables existance by running the following query:  
- - *SELECT table_schema, table_name*  
-*FROM information_schema.tables*  
-*WHERE table_schema = 'inventory'*  
-*ORDER BY table_name;*
+    
+    SELECT table_schema, table_name    
+    FROM information_schema.tables  
+    WHERE table_schema = 'inventory'    
+    ORDER BY table_name;  
 
 Leave this terminal open as we will be issuing SQL statements to generate changes in the database data and test debezium connector and its change data capture functionality.
 
