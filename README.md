@@ -188,7 +188,7 @@ Note that there are two main structures in the json file which are "before" and 
 
 4) Insert the Pub/Sub topic as projects/\<project\>/topics/\<topic-name\>
 
-5) Insert the BigQuery output table as \<project\>:\<dataset\>.\<table\>
+5) Insert the BigQuery output table as \<project\>:\<dataset\>.\<table\> (e.g: *customers_delta*)
 
 6) Insert a Temporary Location (a GCS bucket) where Cloud Dataflow will leave intermediatte files, product of its processing, e.g: gs://cdc-postres-debezium-bq/temp
 
@@ -196,7 +196,18 @@ Note that there are two main structures in the json file which are "before" and 
 
 ### Immediate Consistency approach
 
-Queries reflect the current state of replicated data. Immediate consistency requires a query that joins the main table and the delta table, and selects the most recent row for each primary key.
+With this approach, queries reflect the current state of the replicated data. Immediate consistency requires a query that joins the MAIN table and the DELTA table, and selects the most recent row for each primary key.
+
+Getting back to our example, we have to first perform an initial load in a table in a BigQuery dataset, that we will call *customers_main*. This table will contain an snapshot of the current state of our table in the Postgres DB instance.
+
+You can use the script below to perform the initial load to the BigQuery *customers_main* table.
+
+    INSERT INTO \<project\>.\<dataset\>.customers_main VALUES (1001,'Sally','Thomas','sally.thomas@acme.com',3600);
+    INSERT INTO \<project\>.\<dataset\>.customers_main VALUES (1002,'George','Bailey','gbailey@foobar.com',3600);
+    INSERT INTO \<project\>.\<dataset\>.customers_main VALUES (1003,'Edward','Walker','ed@walker.com',3600);
+    INSERT INTO \<project\>.\<dataset\>.customers_main VALUES (1004,'Anne','Kretchmar','annek@noanswer.org',3600);
+
+As time goes by, the *customers_main* table will start having outdated information. To achieve immediate consistency and to show the current version of the data, this approach proposes to JOIN the MAIN table (*customers_main*) with the DELTA table (*customers_delta*) which contains the track of the changes that occured in the Postgres DB instance.
 
     SELECT * EXCEPT(op, row_num)  
     FROM (  
@@ -211,9 +222,20 @@ Queries reflect the current state of replicated data. Immediate consistency requ
     row_num = 1  
     AND op <> 'D'  
 
+The SQL statement in the preceding BigQuery view does the following:
+
+- The innermost UNION ALL produces the rows from both the main and the delta tables:
+    - SELECT * EXCEPT(change_type), change_type FROM session_delta forces the change_type column to be the last column in the list.
+    - SELECT *, ‘I' FROM session_main selects the row from the main table as if it were an insert row.
+    - Using the * operator keeps the example simple. If there were additional columns or a different column order, replace the shortcut with explicit column lists.
+- SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY change_id DESC) AS row_num uses an analytic function in BigQuery to assign sequential row numbers starting with 1 to each of the groups of rows that have the same value of id, defined by PARTITION BY. The rows are ordered by change_id in descending order within that group. Because change_id is guaranteed to increase, the latest change has a row_num column that has a value of 1.
+- WHERE row_num = 1 AND change_type <> 'D' selects only the latest row from each group. This is a common deduplication technique in BigQuery. This clause also removes the row from the result if its change type is delete.
+- The topmost SELECT * EXCEPT(change_type, row_num) removes the extra columns that were introduced for processing and which aren't relevant otherwise.
+
+
 ### Cost Optimized approach
 
-faster and less expensive queries are executed at the expense of some delay in data availability. You can periodically merge the data into the main table.
+With this approach, queries are faster and less expensive at the expense of some delay in data availability. Data in the DELTA table is periodically merged with the data into the MAIN table.
 
     MERGE `mimetic-might-312320.gentera.customers_main` m  
     USING  
