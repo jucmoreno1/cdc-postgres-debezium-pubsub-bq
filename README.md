@@ -152,37 +152,37 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
 
     You should be able to see a message with the following message body:
 
-    {  
-    "before":{  
-    &nbsp;&nbsp;&nbsp;&nbsp;"id":1001,  
-    &nbsp;&nbsp;&nbsp;&nbsp;"first_name":"Sally",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"last_name":"Thomas",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"email":"sally.thomas@acme.com"  
-    },  
-    "after":{  
-    &nbsp;&nbsp;&nbsp;&nbsp;"id":1001,  
-    &nbsp;&nbsp;&nbsp;&nbsp;"first_name":"your-name",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"last_name":"your last-name",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"email":"your email"  
-    },  
-    "source":{  
-    &nbsp;&nbsp;&nbsp;&nbsp;"version":"1.6.0.Final",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"connector":"postgresql",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"name":"cdc-postgres-instance",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"ts_ms":1626716201707,  
-    &nbsp;&nbsp;&nbsp;&nbsp;"snapshot":"false",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"db":"postgres",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"sequence":"[null,\"118013376\"]",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"schema":"inventory",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"table":"customers",  
-    &nbsp;&nbsp;&nbsp;&nbsp;"txId":2731,  
-    &nbsp;&nbsp;&nbsp;&nbsp;"lsn":118069040,  
-    &nbsp;&nbsp;&nbsp;&nbsp;"xmin":null  
-    },  
-    "op":"u",  
-    "ts_ms":1626716196328,  
-    "transaction":null  
-    }  
+        {  
+        "before":{  
+            "id":1001,  
+            "first_name":"Sally",  
+            "last_name":"Thomas",  
+            "email":"sally.thomas@acme.com"  
+        },  
+        "after":{  
+            "id":1001,  
+            "first_name":"your-name",  
+            "last_name":"your last-name",  
+            "email":"your email"  
+        },  
+        "source":{  
+            "version":"1.6.0.Final",  
+            "connector":"postgresql",  
+            "name":"cdc-postgres-instance",  
+            "ts_ms":1626716201707,  
+            "snapshot":"false",  
+            "db":"postgres",  
+            "sequence":"[null,\"118013376\"]",  
+            "schema":"inventory",  
+            "table":"customers",  
+            "txId":2731,  
+            "lsn":118069040,  
+            "xmin":null  
+            },  
+        "op":"u",  
+        "ts_ms":1626716196328,  
+        "transaction":null  
+        }  
 
 Note that there are two main structures in the json file which are "before" and "after", reflecting the update performed in Postgres database. Also additional metadata information is included in the "source" structure and on the root of the json file, which is valuable information that we will later use in BigQuery to get the most recent version of each record in the table.
 
