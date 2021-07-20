@@ -211,33 +211,29 @@ Queries reflect the current state of replicated data. Immediate consistency requ
     row_num = 1  
     AND op <> 'D'  
 
-    SELECT table_schema, table_name  
-    FROM information_schema.tables  
-    WHERE table_schema = 'inventory'  
-    ORDER BY table_name;  
-
 ### Cost Optimized approach
 
 faster and less expensive queries are executed at the expense of some delay in data availability. You can periodically merge the data into the main table.
 
-MERGE `mimetic-might-312320.gentera.customers_main` m  
-USING  
-  (  
-  SELECT * EXCEPT(row_num)  
-  FROM (  
-    SELECT *, ROW_NUMBER() OVER(PARTITION BY COALESCE(after.id,before.id) ORDER BY delta.ts_ms DESC) AS row_num  
-    FROM `mimetic-might-312320.gentera.customers_delta` delta )  
-  WHERE row_num = 1) d  
-ON  m.id = COALESCE(after.id,before.id)  
-  WHEN NOT MATCHED  
-AND op IN ("c", "u") THEN  
-INSERT (id, first_name, last_name, email, ts_ms)  
-VALUES (d.after.id, d.after.first_name, d.after.last_name, d.after.email, d.ts_ms)  
-  WHEN MATCHED  
-  AND d.op = "d" THEN  
-DELETE  
-  WHEN MATCHED  
-  AND d.op = "u"  
-  AND (m.ts_ms < d.ts_ms) THEN  
-UPDATE  
-SET first_name = d.after.first_name, last_name = d.after.last_name, email = d.after.email, ts_ms = d.ts_ms  
+    MERGE `mimetic-might-312320.gentera.customers_main` m  
+    USING  
+    (  
+    SELECT * EXCEPT(row_num)  
+    FROM (  
+         SELECT *, ROW_NUMBER() OVER(PARTITION BY COALESCE(after.id,before.id) ORDER BY delta.ts_ms DESC) AS row_num  
+         FROM `mimetic-might-312320.gentera.customers_delta` delta
+         )  
+         WHERE row_num = 1) d  
+    ON  m.id = COALESCE(after.id,before.id)  
+    WHEN NOT MATCHED  
+    AND op IN ("c", "u") THEN  
+    INSERT (id, first_name, last_name, email, ts_ms)  
+    VALUES (d.after.id, d.after.first_name, d.after.last_name, d.after.email, d.ts_ms)  
+    WHEN MATCHED  
+    AND d.op = "d" THEN  
+    DELETE  
+    WHEN MATCHED  
+    AND d.op = "u"  
+    AND (m.ts_ms < d.ts_ms) THEN  
+    UPDATE  
+    SET first_name = d.after.first_name, last_name = d.after.last_name, email = d.after.email, ts_ms = d.ts_ms  
