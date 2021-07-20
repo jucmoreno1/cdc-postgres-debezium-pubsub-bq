@@ -41,7 +41,7 @@ As of this example, these are the chosen names for instance, database, schema an
 
 4) Execute the following command to allow database replication for the user the Debezium Connector will use to connect. After performing this step Google Cloud SDK shell can be closed.  
 
-    ALTER USER existing_user WITH REPLICATION;  
+        ALTER USER existing_user WITH REPLICATION;  
 
 ### Cloud SQL Auth Proxy
 
