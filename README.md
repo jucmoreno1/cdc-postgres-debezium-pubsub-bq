@@ -35,7 +35,7 @@ As of this example, these are the chosen names for instance, database, schema an
 
 2) Once the Cloud SQL database (Postgres) has been deployed, connect to your SQL instance using Google Cloud SDK shell with command:  
 
-    gcloud sql connect \<*instance-name*\> --database=\<*database*\> --user=\<*user*\>  
+        gcloud sql connect \<*instance-name*\> --database=\<*database*\> --user=\<*user*\>  
 
 3) Copy and paste SQL statements in file script-inventory.sql and run them to create the template data to be used for the puspose of this tutorial.  
 
