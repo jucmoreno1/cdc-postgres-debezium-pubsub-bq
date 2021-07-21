@@ -276,7 +276,7 @@ With this approach, queries are faster and less expensive at the expense of some
 
 The best way to merge data frequently and consistently is to use a MERGE statement, which lets you combine multiple INSERT, UPDATE, and DELETE statements into a single atomic operation. Following are some of the nuances of the preceding MERGE statement:
 
-- The session_main table is merged with the data source that is specified in the USING clause, a subquery in this case.
+- The customers_main table is merged with the data source that is specified in the USING clause, a subquery in this case.
 - The subquery uses the same technique as the view in immediate consistency approach: it selects the latest row in the group of records that have the same id value—a combination of ROW_NUMBER() OVER(PARTITION BY COALESCE(after.id,before.id) ORDER BY ts_ms DESC) row_num and WHERE row_num = 1.
 - Merge is performed on the id columns of both tables, which is the primary key.
 - The WHEN NOT MATCHED clause checks for a match. If there is no match, the query checks that the latest record is either insert or update, and then inserts the record.
