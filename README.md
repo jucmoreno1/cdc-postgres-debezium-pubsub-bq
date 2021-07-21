@@ -215,10 +215,10 @@ Getting back to our example, we have to first perform an initial load in a table
 
 You can use the script below to perform the initial load to the BigQuery *customers_main* table.
 
-    INSERT INTO \<dataset\>.customers_main VALUES (1001,'Sally','Thomas','sally.thomas@acme.com',3600);
-    INSERT INTO \<dataset\>.customers_main VALUES (1002,'George','Bailey','gbailey@foobar.com',3600);
-    INSERT INTO \<dataset\>.customers_main VALUES (1003,'Edward','Walker','ed@walker.com',3600);
-    INSERT INTO \<dataset\>.customers_main VALUES (1004,'Anne','Kretchmar','annek@noanswer.org',3600);
+    INSERT INTO <dataset>.customers_main VALUES (1001,'Sally','Thomas','sally.thomas@acme.com',3600);
+    INSERT INTO <dataset>.customers_main VALUES (1002,'George','Bailey','gbailey@foobar.com',3600);
+    INSERT INTO <dataset>.customers_main VALUES (1003,'Edward','Walker','ed@walker.com',3600);
+    INSERT INTO <dataset>.customers_main VALUES (1004,'Anne','Kretchmar','annek@noanswer.org',3600);
 
 As time goes by, the *customers_main* table will start having outdated information. To achieve immediate consistency and to show the current version of the data, this approach proposes to JOIN the MAIN table (*customers_main*) with the DELTA table (*customers_delta*) which contains the track of the changes that occured in the Postgres DB instance.
 
