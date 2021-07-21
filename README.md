@@ -241,7 +241,7 @@ The SQL statement in the preceding BigQuery view does the following:
     - SELECT * EXCEPT(op), op FROM customers_delta forces the op (op = operation type) column to be the last column in the list.
     - SELECT *, ‘i' FROM customers_main selects the row from the main table as if it were an insert row.
     - Using the * operator keeps the example simple. If there were additional columns or a different column order, replace the shortcut with explicit column lists.
-- SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num uses an analytic function in BigQuery to assign sequential row numbers starting with 1 to each of the groups of rows that have the same value of id, defined by the PARTITION BY clause. The rows are ordered by ts_ms (timestamp in miliseconds) in descending order within that group. Because ts_ms is guaranteed to increase, the latest change has a row_num column that has a value of 1.
+- SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_ms DESC) AS row_num uses an analytic function in BigQuery to assign sequential row numbers starting with 1 to each of the groups of rows that have the same value of id, defined by the PARTITION BY clause. The rows are ordered by ts_ms (timestamp in milliseconds) in descending order within that group. Because ts_ms is guaranteed to increase, the latest change has a row_num column that has a value of 1.
 - WHERE row_num = 1 AND op <> 'D' selects only the latest row from each group. This is a common deduplication technique in BigQuery. This clause also removes the row from the result if its change type is delete.
 - The topmost SELECT * EXCEPT(op, row_num) removes the extra columns that were introduced for processing and which aren't relevant otherwise.
 
