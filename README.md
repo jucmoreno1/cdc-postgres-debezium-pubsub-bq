@@ -191,6 +191,8 @@ Note that there are two main structures in the json file which are "before" and 
 
 ### Streaming Inserts to BigQuery with Cloud Dataflow
 
+Prerequisite: Create a BigQuery table in the project and dataset of your preference named "customers_delta". Use the schema.json file attached to this project to set the schema to the created table using the option "edit as text".
+
 1) Go to Cloud Dataflow and select option "Create Job from Template".
 
 2) Fill in a Job Name of your preference, e.g: *cdc-pubsub-bigquery*.
@@ -199,7 +201,7 @@ Note that there are two main structures in the json file which are "before" and 
 
 4) Insert the Pub/Sub topic as projects/\<project\>/topics/\<topic-name\>
 
-5) Insert the BigQuery output table as \<project\>:\<dataset\>.\<table\> (e.g: *customers_delta*)
+5) Insert the BigQuery output table as \<project\>:\<dataset\>.\<table\>
 
 6) Insert a Temporary Location (a GCS bucket) where Cloud Dataflow will leave intermediatte files, product of its processing, e.g: gs://cdc-postres-debezium-bq/temp
 
