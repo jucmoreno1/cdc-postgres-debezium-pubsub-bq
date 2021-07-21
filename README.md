@@ -281,11 +281,11 @@ The best way to merge data frequently and consistently is to use a MERGE stateme
 - Merge is performed on the id columns of both tables, which is the primary key.
 - The WHEN NOT MATCHED clause checks for a match. If there is no match, the query checks that the latest record is either insert or update, and then inserts the record.
 - When the record is matched and the operation type is delete, the record is deleted in the main table.
-When the record is matched, the operation type is update, and the delta table's ts_ms value is higher than the ts_ms value of the main record, the data is updated, including the most recent ts_ms value.
-The preceding MERGE statement works correctly for any combinations of the following changes:
+- When the record is matched, the operation type is update, and the delta table's ts_ms value is higher than the ts_ms value of the main record, the data is updated, including the most recent ts_ms value.  
 
-Multiple update rows for the same primary key: only the latest update will apply.
-Unmatched updates in the main table: if the main table doesn't have the record under the primary key, a new record is inserted.
+The preceding MERGE statement works correctly for any combinations of the following changes:
+- Multiple update rows for the same primary key: only the latest update will apply.
+- Unmatched updates in the main table: if the main table doesn't have the record under the primary key, a new record is inserted.
 
 This approach skips the main table extract and starts with the delta table. The main table is automatically populated.
 Insert and update rows in the unprocessed delta batch. The most recent update row is used and a new record is inserted into the main table.
