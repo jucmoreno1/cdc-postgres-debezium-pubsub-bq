@@ -1,5 +1,5 @@
 # Change Data Capture
-## Postgres DB >> Debezium >> Cloud Pub/Sub >> BigQuery
+## Postgres >> Debezium >> Pub/Sub >> Dataflow >> BigQuery
 
 ### Objective
 
