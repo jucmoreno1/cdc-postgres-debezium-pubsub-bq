@@ -7,19 +7,10 @@ Replicate Postgres DB changes (INSERT, UPDATE, DELETE) thru CDC Debezium Connect
 Captured DB changes are sent to Cloud Pub/Sub and pushed to BigQuery thru the template Dataflow Job, Pub/Sub to BigQuery.
 
 ### Prerequisites
-Commands executed in this tutorial where performed in WSL (Windows Subsystem for Linux) in an Ubuntu distribution.
-Needs Java to be installed in the Ubuntu distribution. You can check it with command *java --version*. If not installed please install it by running the following commands.  
 
-    sudo apt-get update  
-    sudo apt install openjdk-11-jre-headless  
-
-Create a folder where we will be storing all the files needed, such as Debezium Connector files, SQL scripts, Cloud SQL Proxy files, etc. As of this example we created a folder called *debezium-server-postgres* by runnging command:  
+Create a folder where we will be storing all the files needed, such as Debezium Connector files, SQL scripts, Cloud SQL Proxy files, etc. As of this example we created a folder called *debezium-server-postgres* by running command:  
 
     mkdir debezium-server-postgres  
-
-Install the Postgres database client by running the following command:  
-
-    sudo apt-get install postgre-client  
 
 ### Cloud SQL Postgres Instance Deployment
 
@@ -33,7 +24,7 @@ As of this example, these are the chosen names for instance, database, schema an
 
     IMPORTANT: Expand the "Show Configurations Options" to customize your instance and go to FLAGS section. Select from the dropdown the FLAG "cloudsql.logical_decoding" and set it to ON. This feature will allow logical decoding on the Cloud SQL instance to convert WAL (write ahead log) entries to JSON format. These JSON entries will be published to the Cloud Pub/Sub topic that we will later create.
 
-2) Once the Cloud SQL database (Postgres) has been deployed, connect to your SQL instance using Google Cloud SDK shell with command:  
+2) Once the Cloud SQL database (Postgres) has been deployed, connect to your SQL instance using Google Cloud Shell with command:  
 
         gcloud sql connect \<*instance-name*\> --database=\<*database*\> --user=\<*user*\>  
 
@@ -126,7 +117,7 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
         mkdir data  
         touch data/offsets.dat  
 
-6) Execute from the terminal the executable file run.sh with the following command:
+6) Execute from the terminal the executable file run.sh with the following command by being at the debezium-server-postgres directory level:
 
         run.sh
 
@@ -143,7 +134,7 @@ https://debezium.io/documentation/reference/1.6/operations/debezium-server.html
         1003 | Edward     | Walker    | ed@walker.com  
         1004 | Anne       | Kretchmar | annek@noanswer.org  
 
-2) We will update user 1001 with the following statement to test the Debezium Connector capturing feature:
+2) By replace values 'your-name', 'your last-name' and 'your e-mail' with your actual name, lastname and e-mail on the statement below, we will update user 1001 to test the Debezium Connector capturing feature:
 
         UPDATE postgres.inventory.customers  
         SET first_name = 'your-name',  
@@ -191,7 +182,7 @@ Note that there are two main structures in the json file which are "before" and 
 
 ### Streaming Inserts to BigQuery with Cloud Dataflow
 
-Prerequisite: Create a BigQuery table in the project and dataset of your preference named "customers_delta". Use the schema.json file attached to this project to set the schema to the created table using the option "edit as text".
+Prerequisite: Create a BigQuery table in the project and dataset of your preference named "customers_delta". Use the *customers_delta_schema.json* file attached to this project to set the schema to the created table using the option "edit as text".
 
 1) Go to Cloud Dataflow and select option "Create Job from Template".
 
@@ -213,7 +204,9 @@ With this approach, queries reflect the current state of the replicated data. Im
 
 Getting back to our example, we have to first perform an initial load in a table in a BigQuery dataset, that we will call *customers_main*. This table will contain an snapshot of the current state of our table in the Postgres DB instance.
 
-You can use the script below to perform the initial load to the BigQuery *customers_main* table.
+Let's first create the table. Use the *customers_main_schema.json* file attached to this project to set the schema using the option "edit as text".
+
+After having created the table, you can use the script below to perform the initial load to the BigQuery *customers_main* table.
 
     INSERT INTO <dataset>.customers_main VALUES (1001,'Sally','Thomas','sally.thomas@acme.com',3600);
     INSERT INTO <dataset>.customers_main VALUES (1002,'George','Bailey','gbailey@foobar.com',3600);
